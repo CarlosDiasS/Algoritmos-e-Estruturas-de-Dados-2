@@ -30,7 +30,7 @@ void RR(noAvl *no)
     aux->dir = no;
     aux->pai = no->pai;
     no->pai = aux;
-    no = aux;
+    no = aux; //para continuar subindo em uma recursão
 }
 
 
@@ -101,10 +101,6 @@ void removeNo(int n){
     //verificar bf
     //add
     //rotacao se necessario
-
-}
-
-void printArvore(noAvl *no){
 
 }
 
