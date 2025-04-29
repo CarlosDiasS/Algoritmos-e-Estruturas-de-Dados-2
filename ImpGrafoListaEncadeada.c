@@ -13,77 +13,90 @@ typedef struct ListaEncadeada
 {
     Aresta *cabeca;
 } ListaEncadeada;
+/*
+    Aloca memória para uma aresta(que ira compor a lista)
 
-Aresta *CriaAresta(int no)
+*/
+Aresta *CriaAresta()
 {
     Aresta *aux = malloc(sizeof(Aresta));
     aux->prox = NULL;
-    aux->no = no;
+    aux->no = -1;
     return aux;
 }
-
-void MockAresta(ListaEncadeada *grafo, int x, int y)
+/*
+    Mock de dados em uma aresta
+*/
+void MockAresta(Aresta *aresta, int no)
 {
-    Aresta *novaAresta = CriaAresta(y);
-    novaAresta->prox = grafo[x].cabeca;
-    grafo[x].cabeca = novaAresta;
+    aresta->no = no;
+    aresta->prox = NULL;
 }
+/*
+    Aloca memória para a lista Enc
 
+*/
 ListaEncadeada *CriaLista(int nos)
 {
 
     ListaEncadeada *lista = malloc(sizeof(ListaEncadeada) * nos);
-    if (!lista)
-    {
-        exit(1);
-    }
     for (int i = 0; i < nos; i++)
     {
         lista[i].cabeca = NULL;
     }
+
     return lista;
 }
 
 /*
     Cria a lista com a função auxiliar
-    Mock dos dados
+    Mock dos dados do arquivo txt
 */
 ListaEncadeada *MockValoresGrafo(int nos)
 {
 
     int arestas, isOrientado = 0;
+    scanf("%d", &arestas);
+    scanf("%d", &isOrientado);
 
     ListaEncadeada *grafo = CriaLista(nos);
-    scanf("%d %d", &arestas, &isOrientado);
 
     for (int i = 0; i < arestas; i++)
     {
-        int x, y = 0;
+        int x, y;
         scanf("%d %d", &x, &y);
-        MockAresta(grafo, x, y);
 
-        // grafo orientado
+        Aresta *nova = CriaAresta();
+        MockAresta(nova, y);
+        nova->prox = grafo[x].cabeca;
+        grafo[x].cabeca = nova;
+
         if (!isOrientado)
         {
-            MockAresta(grafo, y, x);
+            Aresta *nova2 = CriaAresta();
+            MockAresta(nova2, x);
+            nova2->prox = grafo[y].cabeca;
+            grafo[y].cabeca = nova2;
         }
     }
-
     return grafo;
 }
 
 void ImpGrafo(ListaEncadeada *grafo, int nos)
 {
+
     for (int i = 0; i < nos; i++)
     {
-        printf("Nó %d:", i);
         Aresta *aux = grafo[i].cabeca;
         while (aux != NULL)
         {
-            printf(" -> %d", aux->no);
+            if (aux->no)
+            {
+                printf("no %d: arestas: %d\n", i, aux->no);
+            }
+
             aux = aux->prox;
         }
-        printf("\n");  
     }
 }
 /*
@@ -95,7 +108,7 @@ int GetGrauNo(ListaEncadeada *grafo, int no)
 
     int total = 0;
     Aresta *aux = grafo[no].cabeca;
-    while (grafo[no].cabeca != NULL)
+    while (aux != NULL)
     {
         total++;
         aux = aux->prox;
@@ -103,12 +116,12 @@ int GetGrauNo(ListaEncadeada *grafo, int no)
     return total;
 }
 /*
-    Verifica se existe algum Vertices isolado(sem conexoes)
+    Verifica se existe algum Vertice isolado(sem conexoes)
 
 */
 bool isIsolado(ListaEncadeada *grafo, int no)
 {
-    if (GetGrauNo(grafo, no) == 0)
+    if (!GetGrauNo(grafo, no))
     {
         printf("O no %d esta isolado.\n", no);
         return true;
@@ -119,38 +132,46 @@ bool isIsolado(ListaEncadeada *grafo, int no)
         return false;
     }
 }
-
-int GetGrauMax(ListaEncadeada *grafo, int totalNos)
-{
-    int maxGrau = GetGrauNo(grafo, 0);
-    for (int i = 0; i < totalNos; i++)
-    {
-        int aux = GetGrauNo(grafo, i);
-        if (maxGrau > aux)
-        {
-            maxGrau = aux;
-        }
-    }
-    printf("Grau maximo do grafo: %d\n", maxGrau);
-    return maxGrau;
-}
 /*
     Calcula e retorna grau maximo do grafo
 
 */
-int GetGrauMin(ListaEncadeada *grafo, int totalNos)
+int GetGrauMax(ListaEncadeada *grafo, int no, int totalNos)
 {
-    int minGrau = GetGrauNo(grafo, 0);
-    for (int i = 0; i < totalNos; i++)
+    // grau 1 apenas para comparacao
+    int grau = GetGrauNo(grafo, no);
+    int aux = 0;
+    for (int i = 1; i < totalNos; i++)
     {
-        int aux = GetGrauNo(grafo, i);
-        if (minGrau > aux)
+        aux = GetGrauNo(grafo, i);
+        if (grau < aux)
         {
-            minGrau = aux;
+            printf("Grau maximo do grafo: %d\n", aux);
+            aux = grau;
+            return aux;
         }
     }
-    printf("Grau maximo do grafo: %d\n", minGrau);
-    return minGrau;
+    return aux;
+}
+/*
+    Calcula e retorna grau minimo do grafo
+    Similar a GetGrauMax
+
+*/
+int GetGrauMin(ListaEncadeada *grafo, int no, int totalNos)
+{
+    int grau = GetGrauNo(grafo, no); // no 1
+    int aux = 0;
+    for (int i = 1; i < totalNos; i++)
+    {
+        aux = GetGrauNo(grafo, i);
+        if (grau > aux)
+        {
+            printf("Grau minimo do grafo: %d\n", aux);
+            aux = grau;
+        }
+    }
+    return aux;
 }
 /*
     Calcule se os vertices(no) tem o mesmo numero de conexoes(arestas)
@@ -160,11 +181,11 @@ bool isRegular(ListaEncadeada *grafo, int totalNos)
 {
 
     int aux, temp = 0;
-    temp = GetGrauNo(grafo, 0);
+    temp = GetGrauNo(grafo, 1);
 
     for (int i = 1; i < totalNos; i++)
     {
-        aux = GetGrauNo(grafo, i);
+        aux = GetGrauNo(grafo, i + 1);
         if (aux != temp)
         {
             printf("O grafo não é regular.\n");
@@ -183,48 +204,44 @@ bool isCompleto(ListaEncadeada *grafo, int totalNos)
 {
 
     // total de arestas = n*(n+1) /2 n= numero de vertices
-    // https://www.pucsp.br/~jarakaki/grafos/Aula2.pdf
 
     int totalArestas = 0;
 
     for (int i = 0; i < totalNos; i++)
     {
-
-        while (grafo[i].cabeca != NULL)
+        Aresta *aux = grafo[i].cabeca;
+        while (aux != NULL)
         {
-            Aresta *aux = grafo[i].cabeca;
             totalArestas++;
             aux = aux->prox;
         }
     }
 
-    // condicional para a formula (grafo nao direcionado)
+    // condicional para a formula
     if (totalArestas == (totalNos * (totalNos + 1)) / 2)
     {
         printf("O grafo é completo.\n");
         return true;
     }
+    printf("O grafo não é completo.\n");
     return false;
 }
-
-// funcao para liberar memoria
 
 int main()
 {
     int totalNos;
     scanf("%d", &totalNos);
     ListaEncadeada *grafo = MockValoresGrafo(totalNos);
-    // printf("%d",grafo->cabeca->no);
     ImpGrafo(grafo, totalNos);
-
-    for (int i = 2; i < totalNos; i++)
+    printf("\n");
+    for (int i = 1; i < totalNos; i++)
     {
-        printf("Grau do nó %d: %d\n", i, GetGrauNo(grafo, i));
+        printf("Grau do no %d: %d \n", i, GetGrauNo(grafo, i));
     }
+    printf("\n");
+    printf("%d\n", GetGrauMax(grafo, 1, totalNos));
 
-    GetGrauMax(grafo, totalNos);
-    GetGrauMin(grafo, totalNos);
-
+    isIsolado(grafo, 2);
     isRegular(grafo, totalNos);
     isCompleto(grafo, totalNos);
 
