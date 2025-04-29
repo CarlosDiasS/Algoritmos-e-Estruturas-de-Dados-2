@@ -83,7 +83,7 @@ void ImpGrafo(ListaEncadeada *grafo, int nos)
             printf(" -> %d", aux->no);
             aux = aux->prox;
         }
-        printf("\n");
+        printf("\n");  
     }
 }
 /*
@@ -221,7 +221,6 @@ int main()
     {
         printf("Grau do nó %d: %d\n", i, GetGrauNo(grafo, i));
     }
-
 
     GetGrauMax(grafo, totalNos);
     GetGrauMin(grafo, totalNos);
