@@ -35,29 +35,43 @@ typedef struct Fila
 {
     int *vet;
     int size;
+    int inicio;
+    int fim;
+    int tam;
 } Fila;
 
 Fila *CriaFila(int nos)
 {
     Fila *aux = malloc(sizeof(Fila));
     aux->size = nos;
+    aux->inicio = 0;
+    aux->fim = 0;
+    aux->tam = 0;
     aux->vet = malloc(sizeof(int) * nos);
+
     return aux;
 }
 
-No *Desenfilera(Fila *fila)
+int Desenfilera(Fila *fila)
 {
-
-    // pop no primeiro elemento
-    //  decremento no tamanho
+    if (fila->tam > 0)
+    {
+        fila->tam--;
+        return fila->vet[fila->inicio++];
+    }
+    return -1; // erro
 }
-
 void Enfilera(Fila *fila, No *no)
 {
 
     // add
     // realocar
     // incremento tamanho
+    if (fila->size < fila->tam)
+    {
+        fila->tam++;
+        fila->vet[fila->fim++] = no->valor;
+    }
 }
 
 /*
@@ -69,7 +83,6 @@ No *CriaNo()
     No *aux = malloc(sizeof(No));
     aux->prox = NULL;
     aux->antecessor = NULL;
-    aux->valor = -1;
     return aux;
 }
 /*
@@ -109,7 +122,7 @@ ListaEncadeada *MockValoresGrafo(int nos)
 
     ListaEncadeada *grafo = CriaLista(nos);
 
-    for (int i = 0; i <= Nos; i++)
+    for (int i = 0; i < Nos; i++)
     {
         int x, y;
         scanf("%d %d", &x, &y);
@@ -179,7 +192,7 @@ void inicializaVetDados(No *vetor, int nos)
     }
 }
 
-int *Bfs(ListaEncadeada *grafo, int valorBuscado, int nos)
+No *Bfs(ListaEncadeada *grafo, int valorBuscado, int nos)
 {
 
     // um vetor com as 3 infos
@@ -193,23 +206,26 @@ int *Bfs(ListaEncadeada *grafo, int valorBuscado, int nos)
     Fila *fila = CriaFila(nos);
     No *noBuscado = CriaNo(valorBuscado);
     Enfilera(fila, noBuscado);
-    while (fila->size != 0)
+    while (fila->tam > 0)
     {
-        No *aux = Desenfilera(fila);
+        int temp = Desenfilera(fila);
+        No *aux = grafo[temp].cabeca;
 
-        while (aux->prox != NULL)
+        while (aux != NULL)
         {
-            if (aux->cor == BRANCO)
+            int temp2 = aux->valor;
+            if (vetorDados[temp2].cor == BRANCO)
             {
-                aux->cor = CINZA;
+                vetorDados[aux->valor].cor = CINZA;
                 vetorDados[aux->valor].distancia++;
-                vetorDados[aux->valor].antecessor = aux;
+                vetorDados[aux->valor].antecessor = &vetorDados[temp];
                 Enfilera(fila, aux->prox);
             }
             aux = aux->prox;
         }
-        aux->cor = PRETO;
+        vetorDados[temp].cor = PRETO;
     }
+    return vetorDados;
 }
 
 int main()
@@ -217,15 +233,14 @@ int main()
 
     int totalNos;
     scanf("%d", &totalNos);
-    ListaEncadeada *grafo = MockValoresGrafo(totalNos);
-    // ImpGrafo(grafo, totalNos);
 
-    // testar BFS
+    ListaEncadeada *grafo = MockValoresGrafo(totalNos);
+
+    No *vetorDados = Bfs(grafo, 5, totalNos);
 
     return 0;
+
+    /*
+    
+    refazer */
 }
-
-/*
-    finalizar implementação..
-
-*/
