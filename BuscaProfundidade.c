@@ -2,11 +2,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef enum Cor
+{
+    BRANCO,
+    CINZA,
+    PRETO
+} Cor;
 typedef struct No
 {
     int valor;
     struct No *prox;
     struct No *antecessor;
+    Cor cor;
     // conexoes
 
 } No;
@@ -16,22 +23,20 @@ typedef struct ListaEncadeada
     No *cabeca;
 } ListaEncadeada;
 
-typedef enum Cor{
-    BRANCO,
-    CINZA,
-    PRETO
-}Cor;
-
-typedef struct DadosVetor{
+typedef struct DadosVetor
+{
     int antecessor;
     Cor cor;
     int timestamp;
-}DadosVetor;
+} DadosVetor;
 
-DadosVetor *criaVetorDados(int totalNos){
-    DadosVetor *aux = malloc(sizeof(int)*totalNos);
-    if(!aux) return NULL;
-    for(int i=0;i<totalNos;i++){
+DadosVetor *criaVetorDados(int totalNos)
+{
+    DadosVetor *aux = malloc(sizeof(int) * totalNos);
+    if (!aux)
+        return NULL;
+    for (int i = 0; i < totalNos; i++)
+    {
         aux[i].antecessor = NULL;
         aux[i].cor = BRANCO; // nenhum foi visitado ainda;
         aux[i].timestamp = 0;
@@ -121,34 +126,31 @@ void ImpGrafo(ListaEncadeada *grafo, int nos)
     }
 }
 
-void DfsRecursivo(No *u){
+void DfsRecursivo(No *u)
+{
 
+
+
+
+
+
+    
 }
 
-
-DFS(ListaEncadeada * grafo,int nos){
+DFS(ListaEncadeada *grafo, int nos)
+{
 
     DadosVetor *dados = criaVetorDados(nos);
 
-    for(int i=0;i<nos;i++){
-        if()
+    for (int i = 0; i < nos; i++)
+    {
+        No *aux = grafo[i].cabeca;
+        if (aux->cor == BRANCO)
+        {
+            DfsRecursivo(aux);
+        }
     }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 int main(int argc, char const *argv[])
 {
@@ -157,12 +159,6 @@ int main(int argc, char const *argv[])
     scanf("%d", &totalArestas);
     ListaEncadeada *grafo = MockValoresGrafo(totalNos, totalArestas);
     ImpGrafo(grafo, totalNos);
-
-
-
-
-
-
 
     // testes
 
