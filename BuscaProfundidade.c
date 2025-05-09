@@ -16,6 +16,29 @@ typedef struct ListaEncadeada
     No *cabeca;
 } ListaEncadeada;
 
+typedef enum Cor{
+    BRANCO,
+    CINZA,
+    PRETO
+}Cor;
+
+typedef struct DadosVetor{
+    int antecessor;
+    Cor cor;
+    int timestamp;
+}DadosVetor;
+
+DadosVetor *criaVetorDados(int totalNos){
+    DadosVetor *aux = malloc(sizeof(int)*totalNos);
+    if(!aux) return NULL;
+    for(int i=0;i<totalNos;i++){
+        aux[i].antecessor = NULL;
+        aux[i].cor = BRANCO; // nenhum foi visitado ainda;
+        aux[i].timestamp = 0;
+    }
+    return aux;
+}
+
 No *CriaNo()
 {
     No *aux = malloc(sizeof(No));
@@ -51,16 +74,15 @@ ListaEncadeada *CriaLista(int nos)
     Cria a lista com a função auxiliar
     Mock dos dados do arquivo txt
 */
-ListaEncadeada *MockValoresGrafo(int nos)
+ListaEncadeada *MockValoresGrafo(int nos, int totalArestas)
 {
 
-    int Nos, isOrientado = 0;
-    scanf("%d", &Nos);
+    int isOrientado = 0;
     scanf("%d", &isOrientado);
 
     ListaEncadeada *grafo = CriaLista(nos);
 
-    for (int i = 0; i < Nos; i++)
+    for (int i = 0; i < totalArestas; i++)
     {
         int x, y;
         scanf("%d %d", &x, &y);
@@ -99,24 +121,21 @@ void ImpGrafo(ListaEncadeada *grafo, int nos)
     }
 }
 
+void DfsRecursivo(No *u){
+
+}
 
 
+DFS(ListaEncadeada * grafo,int nos){
+
+    DadosVetor *dados = criaVetorDados(nos);
+
+    for(int i=0;i<nos;i++){
+        if()
+    }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -133,18 +152,19 @@ void ImpGrafo(ListaEncadeada *grafo, int nos)
 
 int main(int argc, char const *argv[])
 {
-    int totalNos;
+    int totalNos, totalArestas;
     scanf("%d", &totalNos);
-    ListaEncadeada *grafo = MockValoresGrafo(totalNos);
+    scanf("%d", &totalArestas);
+    ListaEncadeada *grafo = MockValoresGrafo(totalNos, totalArestas);
     ImpGrafo(grafo, totalNos);
 
-    //testes
-
-
-    
 
 
 
+
+
+
+    // testes
 
     return 0;
 }
