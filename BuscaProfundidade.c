@@ -12,9 +12,10 @@ typedef struct No
 {
     int valor;
     struct No *prox;
-    struct No *antecessor;
+    struct No *ant;
     Cor cor;
-    // conexoes
+    int timestampInic;
+    int timestampFin;
 
 } No;
 
@@ -25,21 +26,23 @@ typedef struct ListaEncadeada
 
 typedef struct DadosVetor
 {
-    int antecessor;
+    No *antecessor;
     Cor cor;
-    int timestamp;
+    int timestampInic;
+    int timestampFin;
 } DadosVetor;
 
 DadosVetor *criaVetorDados(int totalNos)
 {
-    DadosVetor *aux = malloc(sizeof(int) * totalNos);
+    DadosVetor *aux = malloc(sizeof(DadosVetor) * totalNos);
     if (!aux)
         return NULL;
     for (int i = 0; i < totalNos; i++)
     {
         aux[i].antecessor = NULL;
         aux[i].cor = BRANCO; // nenhum foi visitado ainda;
-        aux[i].timestamp = 0;
+        aux[i].timestampInic = 0;
+        aux[i].timestampFin = 0;
     }
     return aux;
 }
@@ -48,7 +51,22 @@ No *CriaNo()
 {
     No *aux = malloc(sizeof(No));
     aux->prox = NULL;
-    aux->antecessor = NULL;
+    aux->ant = NULL;
+    aux->timestampInic = 0;
+    aux->timestampFin = 0;
+    aux->cor = BRANCO;
+    return aux;
+}
+
+No *CriaNoNovo(int u)
+{
+    No *aux = malloc(sizeof(No));
+    aux->prox = NULL;
+    aux->valor = u;
+    aux->ant = NULL;
+    aux->timestampInic = 0;
+    aux->timestampFin = 0;
+    aux->cor = BRANCO;
     return aux;
 }
 /*
@@ -126,30 +144,64 @@ void ImpGrafo(ListaEncadeada *grafo, int nos)
     }
 }
 
-void DfsRecursivo(No *u)
+void DfsRecursivo(int u, DadosVetor *dados, ListaEncadeada *grafo, int *temp)
 {
+    // Atualiza o nó atual como visitado (CINZA)
+    dados[u].cor = CINZA;
+    dados[u].timestampInic = ++(*temp);
 
+    // Percorre todos os vizinhos do nó u
+    No *vizinho = grafo[u].cabeca;
+    while (vizinho != NULL)
+    {
+        if (dados[vizinho->valor].cor == BRANCO)
+        {
+            dados[vizinho->valor].antecessor = CriaNoNovo(u);
+            // Define u como antecessor do vizinho (novo no)
+            DfsRecursivo(vizinho->valor, dados, grafo, temp);
+        }
+        vizinho = vizinho->prox;
+    }
 
-
-
-
-
-    
+    // Finaliza o nó (PRETO)
+    dados[u].cor = PRETO;
+    dados[u].timestampFin = ++(*temp);
 }
 
-DFS(ListaEncadeada *grafo, int nos)
+DadosVetor *DFS(ListaEncadeada *grafo, int nos)
 {
 
     DadosVetor *dados = criaVetorDados(nos);
-
+    int temp = 0;
+    printf("ok\n");
     for (int i = 0; i < nos; i++)
     {
-        No *aux = grafo[i].cabeca;
-        if (aux->cor == BRANCO)
+
+        if (dados[i].cor == BRANCO)
         {
-            DfsRecursivo(aux);
+            printf("okcahamda\n");
+
+            DfsRecursivo(i, dados, grafo, &temp);
+            printf("recursao parcial\n");
+        }
+        printf("final recursao\n");
+    }
+    return dados;
+}
+
+void printVetorDados(DadosVetor *vetor, int totalNos)
+{
+    if (vetor != NULL)
+    {
+        for (int i = 0; i < totalNos; i++)
+        {
+            if (vetor[i].antecessor != NULL)
+                printf("%d -> %d\n", i, vetor[i].antecessor->valor);
+            else
+                printf("%d -> NULL\n", i);
         }
     }
+    printf("Vetor vazio.\n");
 }
 
 int main(int argc, char const *argv[])
@@ -160,7 +212,10 @@ int main(int argc, char const *argv[])
     ListaEncadeada *grafo = MockValoresGrafo(totalNos, totalArestas);
     ImpGrafo(grafo, totalNos);
 
-    // testes
+    DadosVetor *vetorDados = DFS(grafo, totalNos);
+    printVetorDados(vetorDados, totalNos);
+
+    // seg fault na hora de retornar da ultimma recusao
 
     return 0;
 }
