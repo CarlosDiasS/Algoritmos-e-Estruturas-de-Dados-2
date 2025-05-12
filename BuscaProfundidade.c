@@ -215,7 +215,6 @@ int main(int argc, char const *argv[])
     DadosVetor *vetorDados = DFS(grafo, totalNos);
     printVetorDados(vetorDados, totalNos);
 
-    // seg fault na hora de retornar da ultimma recusao
 
     return 0;
 }
